@@ -1,0 +1,41 @@
+@import '../../constants/styles';
+
+.edit-state-ee {
+  display: flex;
+  flex-direction: row;
+  margin-top: 4px;
+}
+.swg-status-buttons {
+display: inline-flex;
+margin-right: 4px;
+}  
+
+.swg-status-agree-button {
+  cursor: pointer;
+  flex-shrink: 0;
+  background: green;
+  border-radius: 4px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--primary-button-text);
+  padding: 0 13px;
+  margin: 4px;
+}
+
+.swg-status-disagree-button {
+  cursor: pointer;
+  flex-shrink: 0;
+  background: red;
+  border-radius: 4px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--primary-button-text);
+  padding: 0 13px;
+  margin: 4px;
+}
