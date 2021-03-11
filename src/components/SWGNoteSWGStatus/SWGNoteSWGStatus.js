@@ -10,7 +10,8 @@ import core from 'core';
 import './SWGNoteSWGStatus.scss';
 
 const propTypes = {
-  annotation: PropTypes.object,
+  annotationSWGType: PropTypes.string,
+  annotationSWGStatus: PropTypes.string,
   isSelected: PropTypes.bool,
   isAnnotationModify: PropTypes.bool,
   handleStatusChange: PropTypes.func
@@ -18,7 +19,8 @@ const propTypes = {
 
 function SWGNoteSWGStatus(props) {
   const {
-    annotation,
+    annotationSWGType,
+    annotationSWGStatus,
     isSelected = false,
     handleStatusChange
   } = props;
@@ -32,14 +34,14 @@ function SWGNoteSWGStatus(props) {
       handleStatusChange(status, type);
     }
  };
- 
+
   return (
     <DataElementWrapper
       className="SWGNoteSWGStatus"
       dataElement="swgNoteSWGStatus"
     >
-       { (annotation.getCustomData("SWGtype") === "clarification") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
+       { (annotationSWGType === "clarification") &&
+       (annotationSWGStatus === "none") &&
        (<div class="swg-status-buttons">
           <div
             className="swg-status-agree-button"
@@ -61,8 +63,8 @@ function SWGNoteSWGStatus(props) {
           </div>
         </div>) }
           
-        { (annotation.getCustomData("SWGtype") === "revision") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
+        { (annotationSWGType === "revision") &&
+       (annotationSWGStatus === "none") &&
        (<div class="swg-status-buttons">
           <div
             className="swg-status-disagree-button"
@@ -75,8 +77,8 @@ function SWGNoteSWGStatus(props) {
           </div>
         </div>) }
 
-        { (annotation.getCustomData("SWGtype") === "modification") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
+        { (annotationSWGType === "modification") &&
+       (annotationSWGStatus === "none") &&
        (<div class="swg-status-buttons">
           <div
             className="swg-status-disagree-button"

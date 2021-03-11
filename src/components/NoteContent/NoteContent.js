@@ -66,6 +66,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   
   const dispatch = useDispatch();
   const isReply = annotation.isReply();
+  const [annotationSWGType, setAnnotationSWGType] = useState(annotation.getCustomData("SWGtype"));
+  const [annotationSWGStatus, setAnnotationSWGStatus] = useState(annotation.getCustomData("SWGstatus"));
 
   useDidUpdate(() => {
     if (!isEditing) {
@@ -100,6 +102,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     const annotationManager = core.getAnnotationManager();
     annotationManager.trigger('annotationChanged', [[annotation], 'modify', {}]);
     core.selectAnnotation(annotation);
+    setAnnotationSWGType(type);
+    setAnnotationSWGStatus(status);
   }, [annotation]);
 
   const renderAuthorName = useCallback(
@@ -227,7 +231,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
           </div>
         </div>
         <SWGNoteSWGStatus
-          annotation={annotation}
+          annotationSWGType={annotationSWGType}
+          annotationSWGStatus={annotationSWGStatus}
           handleStatusChange={handleStatusChange}
           isSelected={isSelected}
         />
@@ -246,7 +251,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
           )}
       </div>
     </React.Fragment>
-  ), [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread]);
+  ), [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread, annotationSWGType, annotationSWGStatus]);
 
 
   return useMemo(
