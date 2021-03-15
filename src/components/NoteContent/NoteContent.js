@@ -66,11 +66,13 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   
   const dispatch = useDispatch();
   const isReply = annotation.isReply();
+  
+  const [annotationSWGType, setAnnotationSWGType] = useState(annotation.getCustomData("SWGtype"));
+  const [annotationSWGStatus, setAnnotationSWGStatus] = useState(annotation.getCustomData("SWGstatus"));
 
   useDidUpdate(() => {
     if (!isEditing) {
       dispatch(actions.finishNoteEditing());
-      console.log("NoteContent => dispatch useDidUpdate");
     }
 
     resize();
@@ -90,16 +92,53 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     }
   }, [isContentEditable, isNoteEditingTriggeredByAnnotationPopup, isSelected, setIsEditing, noteIndex]);
   
-  const handleStatusChange = useCallback((status, type) => {
-    console.log("handleStatusChange");
-    console.log(status);
-    console.log(type);
+  useEffect(() => {
+   const onAnnotationChanged = (annotations, action) => {
+      if (
+        action === 'add' &&
+        annotations.length === 1 &&
+        annotations[0] === annotation
+      ) {
+        setAnnotationSWGType( annotation.getCustomData("SWGtype"));
+        setAnnotationSWGStatus(annotation.getCustomData("SWGstatus"));
+      }
+      
+      if (
+        action === 'modify' &&
+        annotations.length === 1 &&
+        annotations[0] === annotation
+      ) {
+        setAnnotationSWGType( annotation.getCustomData("SWGtype"));
+        setAnnotationSWGStatus(annotation.getCustomData("SWGstatus"));
+      }
 
+      if (
+        action === 'delete' &&
+        annotations.length === 1 &&
+        annotations[0] === annotation
+      ) {
+       core.getAnnotationManager().deleteAnnotation(annotation);
+      }
+    };
+
+    core.addEventListener('annotationChanged', onAnnotationChanged);
+    return () => {
+      core.removeEventListener('annotationChanged', onAnnotationChanged);
+    };
+  }, [setAnnotationSWGType, setAnnotationSWGStatus, annotationSWGType, annotationSWGStatus]);
+
+  const handleStatusChange = useCallback((status, type) => {
+    
     annotation.setCustomData("SWGstatus", status);
     annotation.setCustomData("SWGtype", type);
     const annotationManager = core.getAnnotationManager();
+    annotationManager.redrawAnnotation(annotation);
     annotationManager.trigger('annotationChanged', [[annotation], 'modify', {}]);
     core.selectAnnotation(annotation);
+    
+    //change der type and status in NotePanel
+    setAnnotationSWGType(type);
+    setAnnotationSWGStatus(status);
   }, [annotation]);
 
   const renderAuthorName = useCallback(
@@ -165,14 +204,11 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   }
 
   const handleNoteContentClicked = () => {
-    console.log("NoteContent => handleNoteContentClicked isReply");
     if (isReply) {
       onReplyClicked(annotation);
-      console.log("NoteContent => handleNoteContentClicked isReply");
     } else if (!isEditing) {
       //collapse expanded note when top noteContent is clicked if it's not being edited
       onTopNoteContentClicked();
-      console.log("NoteContent => handleNoteContentClicked !isEditing");
     }
   };
 
@@ -213,11 +249,13 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
           </div>
           <div className="state-and-overflow">
             <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
-            <SWGNoteSWGType
+            {!isReply && <SWGNoteSWGType
                 annotation={annotation}
+                annotationSWGType={annotationSWGType}
+                annotationSWGStatus={annotationSWGStatus}
                 handleStatusChange={handleStatusChange}
                 isSelected={isSelected}
-              />
+              />}
             {!isEditing && isSelected &&
               <NotePopup
                 noteIndex={noteIndex}
@@ -226,11 +264,13 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
               />}
           </div>
         </div>
-        <SWGNoteSWGStatus
+        {!isReply && <SWGNoteSWGStatus
           annotation={annotation}
+          annotationSWGType={annotationSWGType}
+          annotationSWGStatus={annotationSWGStatus}
           handleStatusChange={handleStatusChange}
           isSelected={isSelected}
-        />
+        />}
         {isEditing && isSelected ? (
           <ContentArea
             annotation={annotation}
@@ -246,7 +286,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
           )}
       </div>
     </React.Fragment>
-  ), [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread]);
+  ), [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread, , annotationSWGType, annotationSWGStatus]);
 
 
   return useMemo(

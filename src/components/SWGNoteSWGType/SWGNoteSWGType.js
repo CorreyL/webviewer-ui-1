@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 import DataElementWrapper from 'components/DataElementWrapper';
 import Icon from 'components/Icon';
-import useDidUpdate from 'hooks/useDidUpdate';
-import core from 'core';
 
 import './SWGNoteSWGType.scss';
 
 const propTypes = {
   annotation: PropTypes.object,
+  annotationSWGType: PropTypes.string,
+  annotationSWGStatus: PropTypes.string,
   isSelected: PropTypes.bool,
   openOnInitialLoad: PropTypes.bool,
   isAnnotationModify: PropTypes.bool,
@@ -21,9 +21,10 @@ const propTypes = {
 function SWGNoteSWGType(props) {
   const {
     annotation,
+    annotationSWGType,
+    annotationSWGStatus,
     isSelected =false,
     openOnInitialLoad = false,
-    isAnnotationModify,
     handleStatusChange
   } = props;
 
@@ -56,13 +57,10 @@ function SWGNoteSWGType(props) {
     return null;
   }
 
-  if (isAnnotationModify) {
-    console.log("SWGNoteSWGType isAnnotationModify");
-    return null;
-  }
-  const annotationType = annotation.getCustomData("SWGtype");
-  const selectedType = `swg.option.type.${annotationType}`;
-  const isReply = annotation.isReply();
+  const selectedType = `swg.option.type.${annotationSWGType}`;
+  console.log("2222 Welche ist der Type === " + annotationSWGType);
+  console.log("2222 Welche ist der Status === " + annotationSWGStatus);
+  console.log(selectedType);
 
   //user role 1 - admin, 2 - ee, 3 - pr
   return (
@@ -73,15 +71,16 @@ function SWGNoteSWGType(props) {
         onClick={togglePopup}
       >
         <div className="overflow">
-        { (annotation.getCustomData("SWGstatus") === 'rejected') &&
-            (<Icon glyph="icon-annotation-status-rejected" />
+        { annotationSWGStatus === 'rejected' &&
+            (<Icon glyph="icon-annotation-status-cancelled" />
         )}
           {t(selectedType)}
         </div>
-        {isOpen && (
-          <button ref={popupRef} className="note-type-options" onClick={onTypeOptionsButtonClick}>
+        {isOpen && annotationSWGType !== 'modification' && 
+         annotationSWGStatus !== 'rejected' &&
+        (<button ref={popupRef} className="note-type-options" onClick={onTypeOptionsButtonClick}>
             <DataElementWrapper dataElement="notePopupType">
-            { annotationType !== 'revision' && 
+            { annotationSWGType !== 'revision' && 
             (<DataElementWrapper
                 dataElement="notePopupTypeRevision"
                 className="note-type-option"
@@ -90,7 +89,7 @@ function SWGNoteSWGType(props) {
                 {t('swg.option.type.revision')}
               </DataElementWrapper>
               )}
-              {  annotationType !== 'clarification' && 
+              {  annotationSWGType !== 'clarification' && 
               (<DataElementWrapper
                 dataElement="notePopupTypeClarification"
                 className="note-type-option"
@@ -109,21 +108,15 @@ function SWGNoteSWGType(props) {
         onClick={togglePopup}
       >
         <div className="overflow">
+        { annotationSWGStatus === 'rejected' &&
+            (<Icon glyph="icon-annotation-status-cancelled" />
+        )}
           {t(selectedType)}
         </div>
-        {isOpen && (
+        {isOpen && annotationSWGType === 'clarification' && (
           <button ref={popupRef} className="note-type-options" onClick={onTypeOptionsButtonClick}>
             <DataElementWrapper dataElement="notePopupType">
-            { (annotationType !== 'revision') && 
-            (<DataElementWrapper
-                dataElement="notePopupTypeRevision"
-                className="note-type-option"
-                onClick={createOnTypeOptionButtonClickHandler('none', 'revision')}
-              >
-                {t('swg.option.type.revision')}
-              </DataElementWrapper>
-              )}
-              {  (annotationType !== 'clarification') && 
+              {  (annotationSWGType !== 'clarification') && 
               (<DataElementWrapper
                 dataElement="notePopupTypeClarification"
                 className="note-type-option"
@@ -132,7 +125,52 @@ function SWGNoteSWGType(props) {
                 {t('swg.option.type.clarification')}
               </DataElementWrapper>
               )}
-              {  annotationType !== 'modification' && 
+              {  annotationSWGType !== 'modification' && 
+              (<DataElementWrapper
+                dataElement="notePopupTypeModification"
+                className="note-type-option"
+                onClick={createOnTypeOptionButtonClickHandler('none', 'modification')}
+              >
+                {t('swg.option.type.modification')}
+              </DataElementWrapper>
+              )}
+            </DataElementWrapper>
+          </button>
+        )}
+      </DataElementWrapper>
+      <DataElementWrapper
+        className="SWGNoteSWGType"
+        dataElement="swgNoteSWGTypeUserRole1"
+        onClick={togglePopup}
+      >
+        <div className="overflow">
+        { annotationSWGStatus === 'rejected' &&
+            (<Icon glyph="icon-annotation-status-cancelled" />
+        )}
+          {t(selectedType)}
+        </div>
+        {isOpen && (
+          <button ref={popupRef} className="note-type-options" onClick={onTypeOptionsButtonClick}>
+            <DataElementWrapper dataElement="notePopupType">
+            { (annotationSWGType !== 'revision') && 
+            (<DataElementWrapper
+                dataElement="notePopupTypeRevision"
+                className="note-type-option"
+                onClick={createOnTypeOptionButtonClickHandler('none', 'revision')}
+              >
+                {t('swg.option.type.revision')}
+              </DataElementWrapper>
+              )}
+              {  (annotationSWGType !== 'clarification') && 
+              (<DataElementWrapper
+                dataElement="notePopupTypeClarification"
+                className="note-type-option"
+                onClick={createOnTypeOptionButtonClickHandler('none', 'clarification')}
+              >
+                {t('swg.option.type.clarification')}
+              </DataElementWrapper>
+              )}
+              {  annotationSWGType !== 'modification' && 
               (<DataElementWrapper
                 dataElement="notePopupTypeModification"
                 className="note-type-option"

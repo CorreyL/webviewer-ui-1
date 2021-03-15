@@ -1,30 +1,31 @@
 import React, { useState, useRef,  useMemo, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import useOnClickOutside from 'hooks/useOnClickOutside';
 import { useTranslation } from 'react-i18next';
 
 import DataElementWrapper from 'components/DataElementWrapper';
-import Icon from 'components/Icon';
-import core from 'core';
 
 import './SWGNoteSWGStatus.scss';
 
 const propTypes = {
   annotation: PropTypes.object,
+  annotationSWGType: PropTypes.string,
+  annotationSWGStatus: PropTypes.string,
   isSelected: PropTypes.bool,
-  isAnnotationModify: PropTypes.bool,
   handleStatusChange: PropTypes.func
 };
 
 function SWGNoteSWGStatus(props) {
   const {
     annotation,
+    annotationSWGType,
+    annotationSWGStatus,
     isSelected = false,
     handleStatusChange
   } = props;
 
   const [t] = useTranslation();
-  
+  console.log("1111 Welche ist der Type === " + annotationSWGType);
+  console.log("1111 Welche ist der Status === " + annotationSWGStatus);
   const setAnnotationStatus = (e, status, type) => {
     // prevent the textarea from blurring out which will unmount these two buttons
     e.preventDefault();
@@ -33,13 +34,17 @@ function SWGNoteSWGStatus(props) {
     }
  };
  
+ if (!annotation) {
+    return null;
+  }
+
   return (
     <DataElementWrapper
       className="SWGNoteSWGStatus"
       dataElement="swgNoteSWGStatus"
     >
-       { (annotation.getCustomData("SWGtype") === "clarification") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
+       { annotationSWGType === "clarification" && 
+       annotationSWGStatus === "none" && 
        (<div class="swg-status-buttons">
           <div
             className="swg-status-agree-button"
@@ -61,9 +66,9 @@ function SWGNoteSWGStatus(props) {
           </div>
         </div>) }
           
-        { (annotation.getCustomData("SWGtype") === "revision") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
-       (<div class="swg-status-buttons">
+        { annotationSWGType === "revision" && 
+          annotationSWGStatus === "none" && 
+        ( <div class="swg-status-buttons">
           <div
             className="swg-status-disagree-button"
             onClick={e => {
@@ -75,11 +80,11 @@ function SWGNoteSWGStatus(props) {
           </div>
         </div>) }
 
-        { (annotation.getCustomData("SWGtype") === "modification") && 
-       (annotation.getCustomData("SWGstatus") === "none") && 
-       (<div class="swg-status-buttons">
+        { annotationSWGType === "modification" && 
+          annotationSWGStatus === "none" && 
+        ( <div class="swg-status-buttons">
           <div
-            className="swg-status-disagree-button"
+            className="swg-status-modification-button"
             onClick={e => {
               e.stopPropagation();
               setAnnotationStatus(e, "none", "modification");
